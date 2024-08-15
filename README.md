@@ -1,4 +1,4 @@
-# Code Library for the supplemental ECEN 192 Library
+# Supplemental ECEN 192 Code Library
 
 To import it to your Platform IO project, add the following line to your `platformio.ini` file:
 
