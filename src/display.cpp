@@ -11,7 +11,6 @@ bool setup_display(int address)
     display.setTextColor(1);
     display.setRotation(0); // Can be 0, 90, 180, or 270
     display.setTextWrap(true);
-    display.dim(.8); // from 0 to 1
     display.display();
     return true;
 }
