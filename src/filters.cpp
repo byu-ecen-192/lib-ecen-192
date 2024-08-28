@@ -71,7 +71,7 @@ filter_coefficients_t calculate_filter_coefficients_biquad(int low_cutoff, int h
 
     double omega = 2.0 * PI * center_freq / sample_rate;
     double alpha = std::sin(omega) * std::sinh(std::log(2.0) / 2.0 * bandwidth * omega / std::sin(omega));
-    alpha = 1;
+    alpha = .25;
 
     coefficients.b0 = 1.0;
     coefficients.b1 = -2.0 * std::cos(omega);
@@ -145,7 +145,9 @@ bool processWAVFile(const std::string &inputFilePath, const std::string &outputF
     return true;
 }
 
-bool bandRejectFilter(const std::string &inputFilePath, const std::string &outputFilePath,int low_cuttoff, int high_cutoff) {
+bool bandRejectFilter(const std::string &inputFilePath, const std::string &outputFilePath,int freq_cut) {
+    int low_cutoff = freq_cut - 10;
+    int high_cutoff = freq_cut + 10;
     File inputFile = SD.open(inputFilePath.c_str(), FILE_READ);
     if (!inputFile) {
         Serial.println("Error opening input file");
@@ -170,8 +172,13 @@ bool bandRejectFilter(const std::string &inputFilePath, const std::string &outpu
     
 
     //calculate coefficients for 2nd order butterworth filter
-    filter_coefficients_t filter_coefficients_1 = calculate_filter_coefficients_biquad(low_cuttoff,high_cutoff, MIC_SAMPLE_RATE);
-    filter_coefficients_t filter_coefficients_2 = calculate_filter_coefficients_biquad(low_cuttoff,high_cutoff, MIC_SAMPLE_RATE);
+    filter_coefficients_t filter_coefficients_1 = calculate_filter_coefficients_biquad(low_cutoff,high_cutoff, MIC_SAMPLE_RATE);
+    filter_coefficients_t filter_coefficients_2 = calculate_filter_coefficients_biquad(low_cutoff,high_cutoff, MIC_SAMPLE_RATE);
+    filter_coefficients_t filter_coefficients_3 = calculate_filter_coefficients_biquad(low_cutoff,high_cutoff, MIC_SAMPLE_RATE);
+    filter_coefficients_t filter_coefficients_4 = calculate_filter_coefficients_biquad(low_cutoff,high_cutoff, MIC_SAMPLE_RATE);
+    filter_coefficients_t filter_coefficients_5 = calculate_filter_coefficients_biquad(low_cutoff,high_cutoff, MIC_SAMPLE_RATE);
+    filter_coefficients_t filter_coefficients_6 = calculate_filter_coefficients_biquad(low_cutoff,high_cutoff, MIC_SAMPLE_RATE);
+
 
     
     int chuncks_read = 0;
@@ -183,8 +190,12 @@ bool bandRejectFilter(const std::string &inputFilePath, const std::string &outpu
         for (int i = 0; i < samplesRead; i++) {
             buffer[i] = filter(buffer[i], filter_coefficients_1);
             buffer[i] = filter(buffer[i], filter_coefficients_2);
-            if (chuncks_read > 10) {
-                buffer[i] = buffer[i] * 3;
+            buffer[i] = filter(buffer[i], filter_coefficients_3);
+            buffer[i] = filter(buffer[i], filter_coefficients_4);
+            buffer[i] = filter(buffer[i], filter_coefficients_5);
+            buffer[i] = filter(buffer[i], filter_coefficients_6);
+            if (chuncks_read > 1) {
+                buffer[i] = buffer[i] * 100;
             }
     
         }
