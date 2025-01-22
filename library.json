@@ -17,13 +17,11 @@
         {
             "name": "Joshua Montierth",
             "email": "jmontie3@byu.edu"
-            
         }
     ],
     "license": "MIT",
     "dependencies": {
-        "adafruit/Adafruit GFX Library": "*",
-        "adafruit/Adafruit SSD1306": "*"
+        "y-board": "https://github.com/y-board/y-board-v3#v1.0.0"
     },
     "frameworks": [
         "arduino"
